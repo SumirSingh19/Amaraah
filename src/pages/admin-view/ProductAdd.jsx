@@ -1,9 +1,9 @@
 import { useState } from "react";
-import I1 from "../assets/images/1.png";
-import I2 from "../assets/images/2.png";
-import I3 from "../assets/images/3.png";
-import I4 from "../assets/images/4.png";
-import I5 from "../assets/images/5.png";
+import I1 from "../../assets/images/1.png";
+import I2 from "../../assets/images/2.png";
+import I3 from "../../assets/images/3.png";
+import I4 from "../../assets/images/4.png";
+import I5 from "../../assets/images/5.png";
 
 const ProductAdd = () => {
 
