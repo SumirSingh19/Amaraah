@@ -1,23 +1,121 @@
-const addresses = [
-    { id: 1, address: "123 Main St, City, Country", phone: "123-456-7890" },
-    { id: 2, address: "456 Market St, City, Country", phone: "987-654-3210" },
-    // Add more addresses as needed
-];
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const AddressBook = () => (
-    <div className="p-6 bg-white rounded-lg shadow-lg">
-        <h2 className="text-2xl font-semibold mb-6">Address Book</h2>
-        {addresses.map((addr) => (
-            <div key={addr.id} className="flex justify-between items-center border-b pb-4 mb-4">
-                <div>
-                    <h4 className="text-lg">{addr.address}</h4>
-                    <p className="text-sm text-[#8E95A9]">Phone: {addr.phone}</p>
+const AddressBook = () => {
+    const [addresses, setAddresses] = useState([]);
+    const [newAddress, setNewAddress] = useState({
+        address: '',
+        phone: ''
+    });
+    const [error, setError] = useState('');
+
+    // Fetch existing addresses on component load
+    useEffect(() => {
+        const fetchAddresses = async () => {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_NODE_BASE_URL}/api/v1/user/address/get/66dd5affa688832768ae834d1`); // Adjust the userId dynamically
+                setAddresses(response.data);
+            } catch (err) {
+                console.error('Error fetching addresses:', err);
+            }
+        };
+        fetchAddresses();
+    }, []);
+
+    // Handle input change for new address
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setNewAddress((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    // Handle add new address
+    const handleAddAddress = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post('/api/v1/user/address/add', newAddress);
+            setAddresses((prev) => [...prev, response.data]);
+            setNewAddress({ address: '', phone: '' });
+        } catch (err) {
+            setError('Error adding address.');
+            console.error(err);
+        }
+    };
+
+    // Handle address removal
+    const handleRemoveAddress = async (id) => {
+        try {
+            await axios.delete(`/api/v1/user/address/delete/${id}`);
+            setAddresses((prev) => prev.filter((address) => address.id !== id));
+        } catch (err) {
+            console.error('Error removing address:', err);
+        }
+    };
+
+    return (
+        <div className="p-6 bg-white rounded-lg shadow-lg">
+            <h2 className="text-2xl font-semibold mb-6 text-[#652267]">Address Book</h2>
+
+            {/* Display existing addresses */}
+            {addresses.map((addr) => (
+                <div key={addr.id} className="flex justify-between items-center border-b pb-4 mb-4">
+                    <div>
+                        <h4 className="text-lg font-semibold text-[#555F7E]">{addr.address}</h4>
+                        <p className="text-sm text-[#8E95A9]">Phone: {addr.phone}</p>
+                    </div>
+                    <button
+                        className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-700 transition-colors"
+                        onClick={() => handleRemoveAddress(addr.id)}
+                    >
+                        Remove
+                    </button>
                 </div>
-                <button className="bg-red-500 text-white p-2 rounded hover:bg-red-700">Remove</button>
-            </div>
-        ))}
-        <button className="bg-[#652267] text-white p-2 rounded hover:bg-[#8B3A81]">Add New Address</button>
-    </div>
-);
+            ))}
+
+            {/* Add new address form */}
+            <form onSubmit={handleAddAddress} className="mt-4">
+                <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2 text-[#652267]" htmlFor="address">
+                        Address
+                    </label>
+                    <input
+                        type="text"
+                        name="address"
+                        id="address"
+                        value={newAddress.address}
+                        onChange={handleChange}
+                        className="w-full p-3 border border-[#652267] rounded focus:outline-none focus:border-[#823084]"
+                        placeholder="Enter new address"
+                    />
+                </div>
+                <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2 text-[#652267]" htmlFor="phone">
+                        Phone Number
+                    </label>
+                    <input
+                        type="text"
+                        name="phone"
+                        id="phone"
+                        value={newAddress.phone}
+                        onChange={handleChange}
+                        className="w-full p-3 border border-[#652267] rounded focus:outline-none focus:border-[#823084]"
+                        placeholder="Enter phone number"
+                    />
+                </div>
+                {error && <div className="text-red-500 text-center mb-4">{error}</div>}
+                <div className="flex justify-center">
+                    <button
+                        type="submit"
+                        className="bg-[#652267] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#823084] transition"
+                    >
+                        Add New Address
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
+};
 
 export default AddressBook;

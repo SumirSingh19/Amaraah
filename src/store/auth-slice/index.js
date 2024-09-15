@@ -6,13 +6,11 @@ const initialState = {
     isLoading: false,
     error: null,
     user: null,
-    isAdmin: false,
+    role: null,
 };
 
-// Get API URL from environment
-const apiURL = import.meta.env.VITE_NODE_BASE_URL || "http://localhost:5000"; // Fallback to localhost if env variable is missing
+const apiURL = import.meta.env.VITE_NODE_BASE_URL || "http://localhost:5000";
 
-// Log the API base URL to ensure it's correctly set
 if (!import.meta.env.VITE_NODE_BASE_URL) {
   console.error("API Base URL not set. Falling back to default localhost.");
 }
@@ -23,25 +21,23 @@ export const registerUser = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `${apiURL}/api/v1/auth/signup`, // Ensure the correct endpoint is used
+        `${apiURL}/api/v1/auth/signup`,
         formData,
         {
-          withCredentials: true, // Allow sending cookies if needed
+          withCredentials: true,
           headers: {
             "Content-Type": "application/json",
           },
         }
       );
-      console.log("Registration successful:", response.data); // Log success response
-      return response.data; // Return the successful data from API
+      console.log("Registration successful:", response.data);
+      return response.data;
     } catch (error) {
-      console.error("Error during registration:", error); // Log the entire error object
-
-      // Return error message depending on whether it's a server or network error
+      console.error("Error during registration:", error);
       if (error.response) {
-        return rejectWithValue(error.response.data); // Server error
+        return rejectWithValue(error.response.data);
       } else {
-        return rejectWithValue({ message: "Network error. Please try again later." }); // Network error
+        return rejectWithValue({ message: "Network error. Please try again later." });
       }
     }
   }
@@ -54,20 +50,20 @@ export const loginUser = createAsyncThunk(
     try {
       console.log("Form data being sent to the backend:", formData);
       const response = await axios.post(
-        `${apiURL}/api/v1/auth/signin`, // Correct API URL for login
+        `${apiURL}/api/v1/auth/signin`,
         formData,
         {
           withCredentials: true,
         }
       );
-      console.log("Login successful:", response.data); // Log the success response
-      return response.data; // Return the successful data
+      console.log("Login successful:", response.data);
+      return response.data;
     } catch (error) {
-      console.error("Error during login:", error.response?.data || error.message); // Log error
+      console.error("Error during login:", error.response?.data || error.message);
       if (error.response) {
-        return rejectWithValue(error.response.data); // Server error message
+        return rejectWithValue(error.response.data);
       } else {
-        return rejectWithValue({ message: "Network error. Please try again later." }); // Network error
+        return rejectWithValue({ message: "Network error. Please try again later." });
       }
     }
   }
@@ -80,11 +76,13 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.isAuthenticated = true;
       state.user = action.payload;
+      state.role = action.payload?.role || null;
     },
     logout: (state) => {
       state.isAuthenticated = false;
       state.error = null;
       state.user = null;
+      state.role = null;
     },
   },
   extraReducers: (builder) => {
@@ -99,10 +97,12 @@ const authSlice = createSlice({
         if (action.payload.success) {
           state.user = action.payload.user;
           state.isAuthenticated = true;
+          state.role = action.payload.user?.role || null;
           state.error = null;
         } else {
           state.user = null;
           state.isAuthenticated = false;
+          state.role = null;
           state.error = "Registration failed: " + (action.payload.message || "Unknown error");
         }
       })
@@ -110,6 +110,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+        state.role = null;
         state.error = action.payload?.message || "Registration failed.";
       })
       // Login User Reducers
@@ -119,15 +120,17 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        if (action.payload && action.payload.token) {
+        const { token, user } = action.payload || {};
+
+        if (token && user) {
           state.isAuthenticated = true;
-          state.user = action.payload.rest;
-          state.isAdmin = action.payload.rest && action.payload.rest.is_Admin;
+          state.user = user;
+          state.role = user.role || null;
           state.error = null;
         } else {
           state.isAuthenticated = false;
           state.user = null;
-          state.isAdmin = false;
+          state.role = null;
           state.error = "Login failed: Invalid response from server";
         }
       })
@@ -135,7 +138,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isAuthenticated = false;
         state.user = null;
-        state.isAdmin = false;
+        state.role = null;
         state.error = action.payload?.message || "Login failed.";
       });
   },

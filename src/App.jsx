@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Header from "./components/Header";
 import HomePage from "./components/HomePage";
 import Footer from "./components/Footer";
@@ -14,59 +14,55 @@ import AuthRegister from "./pages/auth/Register";
 import ProductAdd from "./pages/admin-view/ProductAdd";
 import Dashboard from "./pages/admin-view/Dashboard";
 import NotFound from "./pages/not-found/Index";
-import CheckAuth from "./components/common/CheckAuth";
 import UserProfile from "./components/shopping-view/UserProfile";
 import OrderHistory from "./pages/shopping-view/Orders";
 import Cart from "./pages/shopping-view/Cart";
 import UserDashboard from "./components/shopping-view/UserDashboard";
-import Wishlist from "./pages/shopping-view/Wishlist.jsx";
+import Wishlist from "./pages/shopping-view/Wishlist";
 import AddressBook from "./pages/shopping-view/AddressBook";
 import { Settings } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useAuth } from "./components/useAuth";
+import UnauthPage from "./pages/not-found/UnauthPage";
 
 const App = () => {
-  // Get authentication state from Redux
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const { isAuthenticated, isLoading } = useAuth();
 
   return (
     <div>
       <Header />
       <Routes>
-        <Route path="/auth"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <AuthLayout />
-            </CheckAuth>
-          }
-        >
+        <Route path="/auth" element={<AuthLayout />}>
           <Route path="signin" element={<AuthLogin />} />
           <Route path="signup" element={<AuthRegister />} />
         </Route>
-        <Route path="*" element={<NotFound />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/prices" element={<GoldPrices />} />
         <Route path="/rings" element={<Rings />} />
         <Route path="/joy-stud-earrings" element={<JoyStudEarrings />} />
-        <Route
-          path="/admin"
+        {/* Admin Routes */}
+        <Route 
+          path="/admin/*" 
           element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <AdminPanel />
-            </CheckAuth>
-          }
+            isAuthenticated 
+              ? <AdminPanel /> 
+              : <Navigate to="/unauth-page" />
+          } 
         >
           <Route path="product-add" element={<ProductAdd />} />
           <Route path="dashboard" element={<Dashboard />} />
+          {/* Catch-all route for admin */}
+          <Route path="*" element={<Dashboard />} />
         </Route>
-        <Route
-          path="/user"
+        {/* User Routes */}
+        <Route 
+          path="/user/*" 
           element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <UserDashboard />
-            </CheckAuth>
-          }
+            isAuthenticated 
+              ? <UserDashboard /> 
+              : <Navigate to="/unauth-page" />
+          } 
         >
           <Route path="profile" element={<UserProfile />} />
           <Route path="orders" element={<OrderHistory />} />
@@ -74,7 +70,12 @@ const App = () => {
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="address-book" element={<AddressBook />} />
           <Route path="settings" element={<Settings />} />
+          {/* Catch-all route for user */}
+          <Route path="*" element={<UserDashboard />} />
         </Route>
+        {/* Unauth Route */}
+        <Route path="/unauth-page" element={<UnauthPage />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
     </div>

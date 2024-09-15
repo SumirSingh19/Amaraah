@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import LOGO from "../../assets/images/logo.png";
 import SHOP from "../../assets/images/shopping-bag.png";
 import USER from "../../assets/images/user.png";
@@ -6,20 +7,21 @@ import TREND from "../../assets/images/trending-up.png";
 import SEARCH from "../../assets/images/search (1).png";
 import BOOK from "../../assets/images/book.png";
 
-const Sidebar = ({ setSelectedPage }) => {
+const Sidebar = () => {
     const [selected, setSelected] = useState(0); // State to track the selected icon
+    const navigate = useNavigate(); // Initialize useNavigate hook
 
     const menuItems = [
-        { icon: SHOP, alt: "Product Add" },
-        { icon: USER, alt: "User Profile" },
-        { icon: TREND, alt: "Trending" },
-        { icon: SEARCH, alt: "Search" },
-        { icon: BOOK, alt: "Dashboard" },
+        { icon: SHOP, alt: "Product Add", path: "/admin/product-add" },
+        { icon: USER, alt: "User Profile", path: "/admin/user-profile" },
+        { icon: TREND, alt: "Trending", path: "/admin/trending" },
+        { icon: SEARCH, alt: "Search", path: "/admin/search" },
+        { icon: BOOK, alt: "Dashboard", path: "/admin/dashboard" }, // Path to Dashboard route
     ];
 
-    const handleIconClick = (index) => {
+    const handleIconClick = (index, path) => {
         setSelected(index); // Set the selected icon for highlighting
-        setSelectedPage(index); // Set the selected page in AdminPanel
+        navigate(path); // Navigate to the associated path
     };
 
     return (
@@ -33,7 +35,7 @@ const Sidebar = ({ setSelectedPage }) => {
                 <div
                     key={index}
                     className={`p-3 rounded-lg cursor-pointer ${selected === index ? 'bg-[#F5E5B5] text-[#2A022C]' : 'bg-[#2A022C]'}`}
-                    onClick={() => handleIconClick(index)} // Set the selected icon on click
+                    onClick={() => handleIconClick(index, item.path)} // Set the selected icon and navigate to the path on click
                 >
                     <img
                         src={item.icon}
