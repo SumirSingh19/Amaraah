@@ -12,8 +12,9 @@ const Cart = () => {
             setLoading(true);
             try {
                 const res = await axios.get(`${import.meta.env.VITE_NODE_BASE_URL}/api/v1/shop/cart/get/66dd5affa688832768ae834d`);
-                setCartItems(res.data.cartItems);
+                setCartItems(res.data.data);
             } catch (err) {
+                console.error(err);
                 setError("Failed to fetch cart items");
             } finally {
                 setLoading(false);
@@ -27,6 +28,7 @@ const Cart = () => {
             await axios.delete(`${import.meta.env.VITE_NODE_BASE_URL}/api/v1/shop/cart/66dd5affa688832768ae834d/${itemId}`);
             setCartItems(cartItems.filter(item => item.id !== itemId));
         } catch (err) {
+            console.error(err)
             setError('Failed to remove item');
         }
     };
@@ -36,6 +38,7 @@ const Cart = () => {
             const res = await axios.put(`${import.meta.env.VITE_NODE_BASE_URL}/api/v1/shop/cart/update-cart`, { id: itemId, quantity });
             setCartItems(cartItems.map(item => item.id === itemId ? { ...item, quantity: res.data.quantity } : item));
         } catch (err) {
+            console.error(err);
             setError('Failed to update quantity');
         }
     };
@@ -44,7 +47,9 @@ const Cart = () => {
         try {
             const res = await axios.post(`${import.meta.env.VITE_NODE_BASE_URL}/api/v1/shop/cart/checkout`, { cartItems });
             alert('Checkout successful!');
+            console.log(res.data);
         } catch (err) {
+            console.error(err);
             setError('Checkout failed');
         }
     };

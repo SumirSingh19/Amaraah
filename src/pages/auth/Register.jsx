@@ -52,7 +52,7 @@ const AuthRegister = () => {
       const response = await dispatch(registerUser(formData)).unwrap();
       console.log("Registration response:", response);
 
-      if (response && (response.success || response.user)) {
+      if (response) {
         console.log("Registration successful, navigating to signin");
         // You might want to show a success message here
         navigate("/auth/signin");

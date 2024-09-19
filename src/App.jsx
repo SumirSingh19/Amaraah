@@ -45,14 +45,13 @@ const App = () => {
         <Route 
           path="/admin/*" 
           element={
-            isAuthenticated 
+            !isAuthenticated 
               ? <AdminPanel /> 
               : <Navigate to="/unauth-page" />
           } 
         >
           <Route path="product-add" element={<ProductAdd />} />
           <Route path="dashboard" element={<Dashboard />} />
-          {/* Catch-all route for admin */}
           <Route path="*" element={<Dashboard />} />
         </Route>
         {/* User Routes */}
@@ -70,10 +69,8 @@ const App = () => {
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="address-book" element={<AddressBook />} />
           <Route path="settings" element={<Settings />} />
-          {/* Catch-all route for user */}
           <Route path="*" element={<UserDashboard />} />
         </Route>
-        {/* Unauth Route */}
         <Route path="/unauth-page" element={<UnauthPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

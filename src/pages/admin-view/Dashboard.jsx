@@ -11,8 +11,8 @@ const Dashboard = () => {
         paymentMethod: '',
         paymentStatus: '',
         totalAmount: '',
-        orderDate: '',
-        orderUpdateDate: '',
+        // orderDate: '',
+        // orderUpdateDate: '',
         paymentId: '',
         payerId: '',
         cartId: '',
@@ -22,7 +22,7 @@ const Dashboard = () => {
         // Fetch existing orders
         const fetchOrders = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_NODE_BASE_URL}/api/v1/shop/orders`);
+                const response = await axios.get(`${import.meta.env.VITE_NODE_BASE_URL}/api/v1/shop/order`);
                 if (Array.isArray(response.data)) {
                     setOrders(response.data); // Ensure the response is an array
                 } else {

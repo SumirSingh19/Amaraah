@@ -9,7 +9,7 @@ const initialState = {
     role: null,
 };
 
-const apiURL = import.meta.env.VITE_NODE_BASE_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_NODE_BASE_URL | "http://localhost:3000";
 
 if (!import.meta.env.VITE_NODE_BASE_URL) {
   console.error("API Base URL not set. Falling back to default localhost.");
@@ -21,7 +21,7 @@ export const registerUser = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `${apiURL}/api/v1/auth/signup`,
+        `http://localhost:3000/api/v1/auth/signup`,
         formData,
         {
           withCredentials: true,
@@ -50,7 +50,7 @@ export const loginUser = createAsyncThunk(
     try {
       console.log("Form data being sent to the backend:", formData);
       const response = await axios.post(
-        `${apiURL}/api/v1/auth/signin`,
+        `${API_BASE_URL}/api/v1/auth/signin`,
         formData,
         {
           withCredentials: true,
@@ -76,7 +76,7 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.isAuthenticated = true;
       state.user = action.payload;
-      state.role = action.payload?.role || null;
+      state.role = action.payload?.is_admin || null;
     },
     logout: (state) => {
       state.isAuthenticated = false;
@@ -121,8 +121,9 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         const { token, user } = action.payload || {};
-
+      
         if (token && user) {
+          localStorage.setItem('token', token); // Store token
           state.isAuthenticated = true;
           state.user = user;
           state.role = user.role || null;
@@ -133,7 +134,7 @@ const authSlice = createSlice({
           state.role = null;
           state.error = "Login failed: Invalid response from server";
         }
-      })
+      })      
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = false;
