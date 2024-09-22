@@ -8,7 +8,8 @@ export const addProduct = createAsyncThunk(
   'product/addProduct',
   async (productData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${baseURL}/api/v1/admin/products/create`, productData);
+      console.log(baseURL);
+      const response = await axios.post(`${baseURL}/api/v1/admin/products/add`, productData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Error adding product');

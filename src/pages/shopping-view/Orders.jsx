@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
+import { useAuth } from '@/components/useAuth';
 
 const initialOrders = [
     {
@@ -14,15 +15,31 @@ const initialOrders = [
 
 const OrderHistory = () => {
     const [orderData, setOrderData] = useState(initialOrders);
+    const { user } = useAuth();
 
     const handlePlaceOrder = async (newOrder) => {
         try {
+            console.log(newOrder);
             const response = await axios.post(`${import.meta.env.VITE_NODE_BASE_URL}/api/v1/shop/order/create`, newOrder);
             setOrderData((prevOrders) => [...prevOrders, response.data]);
         } catch (error) {
             console.error('Error placing order:', error);
         }
     };
+
+    const getAllOrders = useCallback(async () => {
+        try {
+            const res = await axios.get(`${import.meta.env.VITE_NODE_BASE_URL}/api/v1/shop/order/list/${user._id}`);
+            setOrderData(res.data.data);
+            console.log(res.data.data);
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+        }
+    }, [user._id]);
+
+    useEffect(() => {
+        getAllOrders();
+    }, [getAllOrders]);
 
     // Example new order
     const exampleOrder = {
@@ -62,8 +79,8 @@ const OrderHistory = () => {
                     ))}
                 </tbody>
             </table>
-            <button 
-                className="bg-[#652267] text-white p-2 rounded hover:bg-[#8B3A81]" 
+            <button
+                className="bg-[#652267] text-white p-2 rounded hover:bg-[#8B3A81]"
                 onClick={() => handlePlaceOrder(exampleOrder)}
             >
                 Place Order

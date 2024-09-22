@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { useAuth } from '@/components/useAuth';
 
 const AddressBook = () => {
+    const { user } = useAuth();
     const [addresses, setAddresses] = useState([]);
     const [newAddress, setNewAddress] = useState({
         address: '',
@@ -9,18 +11,18 @@ const AddressBook = () => {
     });
     const [error, setError] = useState('');
 
-    // Fetch existing addresses on component load
+    const fetchAddresses = useCallback(async () => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_NODE_BASE_URL}/api/v1/user/address/get/${user._id}`); // Adjust the userId dynamically
+            setAddresses(response.data.data);
+        } catch (err) {
+            console.error('Error fetching addresses:', err);
+        }
+    }, [user._id]);
+
     useEffect(() => {
-        const fetchAddresses = async () => {
-            try {
-                const response = await axios.get(`${import.meta.env.VITE_NODE_BASE_URL}/api/v1/user/address/get/66dd5affa688832768ae834d1`); // Adjust the userId dynamically
-                setAddresses(response.data.data);
-            } catch (err) {
-                console.error('Error fetching addresses:', err);
-            }
-        };
         fetchAddresses();
-    }, []);
+    }, [fetchAddresses]);
 
     // Handle input change for new address
     const handleChange = (e) => {

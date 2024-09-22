@@ -22,47 +22,54 @@ const ProductAdd = () => {
   const [labourCost, setLabourCost] = useState("");
   const [totalStock, setTotalStock] = useState("");
   const [images, setImages] = useState([null, null, null, null, null]);
+  const [image, setImage] = useState(null);
+  const [sending, setSending] = useState(false);
 
   // Handle image input
-  const handleImageChange = (e, index) => {
-    const files = e.target.files;
-    if (files && files[0]) {
-      const updatedImages = [...images];
-      updatedImages[index] = files[0]; // Store the file object instead of the URL
-      setImages(updatedImages);
+  // const handleImageChange = (e, index) => {
+  //   const files = e.target.files;
+  //   if (files && files[0]) {
+  //     const updatedImages = [...images];
+  //     updatedImages[index] = files[0]; // Store the file object instead of the URL
+  //     setImages(updatedImages);
+  //   }
+  // };
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
     }
   };
 
   // Handle product submission
   const handleSubmit = async () => {
-    const uploadedImages = await Promise.all(
-      images.map(async (image) => {
-        if (image) {
-          const formData = new FormData();
-          formData.append("image", image);
-          const result = await dispatch(uploadImage(formData)).unwrap();
-          return result.imageUrl; // Assuming the API returns the image URL
-        }
-        return null;
-      })
-    );
+    setSending(true);
+    let imageUrl = null;
+    if (image) {
+      const formData = new FormData();
+      formData.append("my_file", image);
+      const result = await dispatch(uploadImage(formData)).unwrap();
+      imageUrl = result.url;
+    }
 
     const productData = {
       title: productTitle,
       category: productCategory,
-      karats,
-      weight,
-      grossWeight,
-      diaWeight,
+      karat : parseInt(karats),
+      weight : parseInt(weight),
+      grossWeight : parseInt(grossWeight),
+      diaWeight : parseInt(diaWeight),
       description,
-      price,
-      labourCost,
-      totalStock,
-      images: uploadedImages.filter((img) => img !== null), // Only include successfully uploaded images
+      price : parseInt(price),
+      labourCost : parseInt(labourCost),
+      totalStock: parseInt(totalStock),
+      image: imageUrl,
     };
+    console.log(productData);
 
     // Dispatch the action to add the product
     dispatch(addProduct(productData));
+    setSending(false);
   };
 
   return (
@@ -247,7 +254,7 @@ const ProductAdd = () => {
             onClick={handleSubmit}
             className="bg-[#5A2C6D] hover:bg-[#4A2356] text-white py-2 px-6 rounded"
           >
-            Save Product
+            {!sending ? "Save" : <p className="animate-spin">i</p>}
           </button>
         </div>
       </div>

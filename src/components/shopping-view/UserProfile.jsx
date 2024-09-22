@@ -1,10 +1,9 @@
 import { useAuth } from "../useAuth";
 
 const UserProfile = () => {
-    const { user } = useAuth(); // Fetch the user from authentication context
-
+    const { user } = useAuth();
     if (!user) {
-        return <p>Loading...</p>; // Handle case where user data is not yet loaded
+        return <p>Loading...</p>;
     }
 
     return (

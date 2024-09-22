@@ -42,26 +42,26 @@ const App = () => {
         <Route path="/rings" element={<Rings />} />
         <Route path="/joy-stud-earrings" element={<JoyStudEarrings />} />
         {/* Admin Routes */}
-        <Route 
-          path="/admin/*" 
+        <Route
+          path="/admin/*"
           element={
-            !isAuthenticated 
-              ? <AdminPanel /> 
-              : <Navigate to="/unauth-page" />
-          } 
+            // !isAuthenticated ? 
+            <AdminPanel />
+              // : <Navigate to="/unauth-page" />
+          }
         >
           <Route path="product-add" element={<ProductAdd />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="*" element={<Dashboard />} />
         </Route>
         {/* User Routes */}
-        <Route 
-          path="/user/*" 
+        <Route
+          path="/user/*"
           element={
-            isAuthenticated 
-              ? <UserDashboard /> 
-              : <Navigate to="/unauth-page" />
-          } 
+            // isAuthenticated ? 
+            <UserDashboard />
+            // : <Navigate to="/unauth-page" />
+          }
         >
           <Route path="profile" element={<UserProfile />} />
           <Route path="orders" element={<OrderHistory />} />
