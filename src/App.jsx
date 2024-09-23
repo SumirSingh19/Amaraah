@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Header from "./components/Header";
 import HomePage from "./components/HomePage";
 import Footer from "./components/Footer";
@@ -21,11 +21,11 @@ import UserDashboard from "./components/shopping-view/UserDashboard";
 import Wishlist from "./pages/shopping-view/Wishlist";
 import AddressBook from "./pages/shopping-view/AddressBook";
 import { Settings } from "lucide-react";
-import { useAuth } from "./components/useAuth";
+// import { useAuth } from "./components/useAuth";
 import UnauthPage from "./pages/not-found/UnauthPage";
 
 const App = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  // const { isAuthenticated, isLoading } = useAuth();
 
   return (
     <div>
